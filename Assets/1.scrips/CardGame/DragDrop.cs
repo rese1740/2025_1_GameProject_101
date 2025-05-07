@@ -47,7 +47,71 @@ public class DragDrop : MonoBehaviour
         isDragging = false;
         GetComponent<SpriteRenderer>().sortingOrder = 1;
 
+        if (gameManager == null)
+        {
         RetrunToOriginalPosition();
+            return;
+        }
+        bool wasInMergeArea = startParent == gameManager.MergeArea;
+
+       
+        if (IsOverArea(gameManager.handArea))
+        {
+            Debug.Log("손패 옆으로 이동");
+            if (wasInMergeArea)
+            {
+                Debug.Log(wasInMergeArea);
+                for (int i = 0; i < gameManager.mergeCount; i++)
+                {
+                    if (gameManager.mergeCards[i] == gameObject)
+                    {
+                        for (int j = i; j < gameManager.mergeCount - 1; j++)
+                        {
+                            gameManager.mergeCards[j] = gameManager.mergeCards[j + 1];
+                        }
+                        gameManager.mergeCards[gameManager.mergeCount - 1] = null;
+                        gameManager.mergeCount--;
+
+                        transform.SetParent(gameManager.handArea);
+                        gameManager.handCards[gameManager.handCount] = gameObject;
+                        gameManager.handCount++;
+
+                        gameManager.ArrangeHand();
+                        gameManager.ArrangeMerge();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log(wasInMergeArea);
+                gameManager.ArrangeHand();
+            }
+        }
+        else if (IsOverArea(gameManager.MergeArea))
+        {
+            if (gameManager.mergeCount >= gameManager.maxMergeSize)
+            {
+                RetrunToOriginalPosition();
+            }
+            else
+            {
+                gameManager.MoveCardToMerge(gameObject);
+            }
+        }
+        else
+        {
+            RetrunToOriginalPosition();
+        }
+
+        if (wasInMergeArea)
+        {
+            if(gameManager.mergeButton != null)
+            {
+                bool canMerge = (gameManager.mergeCount == 2 || gameManager.mergeCount == 3);
+                gameManager.mergeButton.interactable = canMerge;
+            }
+        }
     }
 
     //원래 위치로 돌아가는 함수
@@ -63,22 +127,37 @@ public class DragDrop : MonoBehaviour
             {
                 gameManager.ArrangeHand();
             }
+            if(startParent == gameManager.MergeArea)
+            {
+                gameManager.ArrangeMerge();
+            }
         }
     }
 
-    bool IsOverArea(Transform area)
+    bool IsOverArea(Transform area) //카드가 특정 영역 위에 있는지 확인
     {
-        if(area == null)
+        if (area == null)
         {
             return false;
         }
-        
-        //영역의 콜라이더를 가져옴
-        Collider2D areaCollider = area.GetComponent<Collider2D>();
-        if (areaCollider == null)
-            return false;
 
-        return areaCollider.bounds.Contains(transform.position);
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); 
+        mousePosition.z = 0; //2D 이기 때문에
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePosition, Vector2.zero); 
+
+        foreach (RaycastHit2D hit in hits) 
+        {
+            if (hit.collider != null && hit.collider.transform == area) 
+            {
+                Debug.Log(area.name + " 영역 감지됨");
+                return true;
+            }
+        }
+
+        return false;
     }
+
+
 
 }

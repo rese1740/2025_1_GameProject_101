@@ -285,12 +285,17 @@ MonoBehaviour:
   handArea: {fileID: 433420372}
   drawButton: {fileID: 167167330}
   deckCountText: {fileID: 0}
-  cardSpacing: 2
+  cardSpacing: 5
   maxHandSize: 6
   deckCards: []
   deckcount: 0
   handCards: []
   handCount: 0
+  MergeArea: {fileID: 795750507}
+  mergeButton: {fileID: 554491183}
+  maxMergeSize: 3
+  mergeCards: []
+  mergeCount: 0
   prefedinedDeck: 0100000001000000010000000100000001000000010000000100000001000000020000000200000002000000020000000200000002000000030000000300000003000000030000000400000004000000
 --- !u!4 &259888168
 Transform:
@@ -669,7 +674,7 @@ GameObject:
   - component: {fileID: 795750504}
   - component: {fileID: 795750503}
   m_Layer: 0
-  m_Name: HandArea (1)
+  m_Name: MergeArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
